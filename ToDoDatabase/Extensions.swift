@@ -50,7 +50,6 @@ extension UIViewController {
             alertVC.completion = { [weak self] result in
                 UIView.animate(withDuration: 0.4) {
                     self?.view.alpha = 1
-                    self?.navigationController?.navigationBar.alpha = 1
                 }
                 self?.dismiss(animated: true, completion: nil)
                 
@@ -61,7 +60,6 @@ extension UIViewController {
             
             UIView.animate(withDuration: 0.4) {
                 self.view.alpha = 0.4
-                self.navigationController?.navigationBar.alpha = 0.4
             }
             present(alertVC, animated: true)
         }

@@ -25,6 +25,10 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let rightButton = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addFolderTap))
+        navigationItem.rightBarButtonItem = rightButton
+        title = "Folders"
         tableview.tableFooterView = UIView(frame: .zero)
     }
     
@@ -33,7 +37,8 @@ class ViewController: UIViewController {
         model.fetchFolders()
     }
     
-    @IBAction private func addFolderTap() {
+    @objc
+    private func addFolderTap() {
         presentInputPopUp(isFolder: true) { [weak self] result in
             self?.model.addFolder(name: result.name)
         }
@@ -89,23 +94,6 @@ extension ViewController: UITableViewDataSource {
 //UITableViewDelegate
 
 extension ViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        70
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: tableview.frame.width, height: 70))
-        let label = UILabel(frame: .zero)
-        label.font = .systemFont(ofSize: 24)
-        label.text = "Folders"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
-        return view
-    }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         

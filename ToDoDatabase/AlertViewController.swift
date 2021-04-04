@@ -48,9 +48,18 @@ class AlertViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(hideKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        nameTextField.becomeFirstResponder()
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         sheetView.roundCorners(corners: [.topLeft, .topRight], radius: 8)
+    }
+    
+    @IBAction private func tapClose() {
+        completion?(nil)
     }
     
     @objc
