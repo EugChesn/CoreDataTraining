@@ -12,7 +12,6 @@ class ViewController: UIViewController {
     
     var model: Modeling!
     
-    @IBOutlet private weak var addButton: UIButton!
     @IBOutlet private weak var tableview: UITableView!
     
     required init?(coder: NSCoder) {
@@ -25,23 +24,12 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let rightButton = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addFolderTap))
-        navigationItem.rightBarButtonItem = rightButton
-        title = "Folders"
-        tableview.tableFooterView = UIView(frame: .zero)
+        updateUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         model.fetchFolders()
-    }
-    
-    @objc
-    private func addFolderTap() {
-        presentInputPopUp(isFolder: true) { [weak self] result in
-            self?.model.addFolder(name: result.name)
-        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -52,6 +40,20 @@ class ViewController: UIViewController {
                 let model = ModelTaskList(databaseService: database, folder: folderObject)
                 viewController.model = model
             }
+        }
+    }
+    
+    private func updateUI() {
+        let rightButton = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addFolderTap))
+        navigationItem.rightBarButtonItem = rightButton
+        title = "Folders"
+        tableview.tableFooterView = UIView(frame: .zero)
+    }
+    
+    @objc
+    private func addFolderTap() {
+        presentInputPopUp(isFolder: true) { [weak self] result in
+            self?.model.addFolder(name: result.name)
         }
     }
 }
@@ -81,10 +83,11 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "folderCell")
-        cell.textLabel?.text = model.fetchedObjects?[indexPath.row].name
-        cell.detailTextLabel?.text = model.fetchedObjects?[indexPath.row].date?.toString()
+        
+        let currentFolder = model.fetchedObjects?[indexPath.row]
+        cell.textLabel?.text = currentFolder?.name
+        cell.detailTextLabel?.text = currentFolder?.date?.toString()
         
         return cell
     }

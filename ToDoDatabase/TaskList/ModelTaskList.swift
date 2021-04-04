@@ -16,42 +16,50 @@ protocol TaskListModeling {
     func addTask(data: TaskData)
     func removeTask(index: Int)
     
+    func testMax()
+    
     var taskList: [Task] { get }
     var folderName: String { get }
     var delegateView: DelegateUpdateViewTaskList? { get set }
 }
 
-class ModelTaskList: NSObject, TaskListModeling {
+class ModelTaskList {
  
-    private var databaseService: DatabaseLayerTaskList?
+    private var databaseService: DatabaseLayerTaskList
     private var folder: Folder
     
     weak var delegateView: DelegateUpdateViewTaskList?
-    
-    var folderName: String {
-        folder.name ?? "ERROR"
-    }
     
     var taskList: [Task] = [] {
         didSet {
             delegateView?.update()
         }
     }
-    
+        
     init(databaseService: DatabaseLayerTaskList, folder: Folder) {
         self.databaseService = databaseService
         self.folder = folder
         self.taskList = Array(folder.tasks ?? [])
     }
+}
+
+extension ModelTaskList: TaskListModeling {
+    var folderName: String {
+        folder.name ?? "ERROR"
+    }
     
     func addTask(data: TaskData) {
-        if let task = databaseService?.addTask(folder: folder, taskData: data) {
+        if let task = databaseService.addTask(folder: folder, taskData: data) {
             taskList.append(task)
         }
     }
     
     func removeTask(index: Int) {
         let task = taskList.remove(at: index)
-        databaseService?.removeTask(folder: folder, task: task)
+        databaseService.removeTask(folder: folder, task: task)
+    }
+    
+    func testMax() {
+        databaseService.testMax(nameFolder: folder.name!)
     }
 }

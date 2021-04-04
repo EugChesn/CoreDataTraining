@@ -11,11 +11,12 @@ import CoreData
 protocol DataBaseTaskList {
     func addTask(folder: Folder, taskData: TaskData) -> Task?
     func removeTask(folder: Folder, task: Task)
+    func testMax(nameFolder: String)
 }
 
 class DatabaseLayerTaskList: DataBaseTaskList {
     
-    lazy var persistentContainer: NSPersistentContainer = {
+    private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "modelData")
         container.loadPersistentStores(completionHandler: { (_, error) in
             if let error = error as NSError? {
@@ -25,11 +26,11 @@ class DatabaseLayerTaskList: DataBaseTaskList {
         return container
     }()
     
-    var viewContext: NSManagedObjectContext {
+    private var viewContext: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
-    var backgroundContext: NSManagedObjectContext {
+    private var backgroundContext: NSManagedObjectContext {
         persistentContainer.newBackgroundContext()
     }
         
@@ -54,6 +55,33 @@ class DatabaseLayerTaskList: DataBaseTaskList {
             do {
                 try context.save()
             } catch {
+                print("error")
+            }
+        }
+    }
+    
+    func testMax(nameFolder: String) {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Folder")
+        request.resultType = .dictionaryResultType
+
+        let expressionDescription = NSExpressionDescription()
+        expressionDescription.name = "max"
+        let keypathExpression = NSExpression(forKeyPath: #keyPath(Folder.tasks)) // count?
+        expressionDescription.expression = NSExpression(forFunction: "max:", arguments: [keypathExpression])
+        expressionDescription.expressionResultType = .integer64AttributeType
+
+        
+        request.propertiesToFetch = [expressionDescription]
+        request.predicate = NSPredicate(format: "name == %@", nameFolder)
+       
+        
+        persistentContainer.performBackgroundTask { (context) in
+            do {
+                if let result = try context.fetch(request) as? [[String: Int64]] {
+                    print(result.first?.values)
+                }
+            }
+            catch {
                 print("error")
             }
         }

@@ -11,9 +11,9 @@ class TaskCell: UITableViewCell {
     
     static let reuseIndetifier = "TaskCell"
     
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var contentLabel: UILabel!
-    @IBOutlet weak var timeLabel: UILabel!
+    @IBOutlet private weak var nameLabel: UILabel!
+    @IBOutlet private weak var contentLabel: UILabel!
+    @IBOutlet private weak var timeLabel: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -26,10 +26,9 @@ class TaskCell: UITableViewCell {
         timeLabel.text = nil
     }
 
-    func configure(name: String, content: String, date: Date) {
+    func configure(name: String?, content: String?, date: Date?) {
         nameLabel.text = name
         contentLabel.text = content
-        timeLabel.text = date.toString()
+        timeLabel.text = date?.toString()
     }
-    
 }

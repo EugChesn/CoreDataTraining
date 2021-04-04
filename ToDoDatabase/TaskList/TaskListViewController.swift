@@ -15,6 +15,10 @@ class TaskListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        updateUI()
+    }
+    
+    private func updateUI() {
         title = model.folderName
         let rightButton = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(tapPlus))
         navigationItem.rightBarButtonItem = rightButton
@@ -32,6 +36,7 @@ class TaskListViewController: UIViewController {
         presentInputPopUp { [weak self] result in
             self?.model.addTask(data: result)
         }
+       // model.testMax()
     }
 }
 
@@ -51,7 +56,7 @@ extension TaskListViewController: UITableViewDataSource {
         else { return .init() }
         
         let task = model.taskList[indexPath.row]
-        cell.configure(name: task.name ?? "", content: task.content ?? "", date: task.date ?? Date())
+        cell.configure(name: task.name, content: task.content, date: task.date)
         
         return cell
     }

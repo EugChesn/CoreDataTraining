@@ -25,7 +25,7 @@ class DataBaseLayer {
         viewContext.automaticallyMergesChangesFromParent = true
     }
     
-    lazy var persistentContainer: NSPersistentContainer = {
+    private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "modelData")
         container.loadPersistentStores(completionHandler: { (_, error) in
             if let error = error as NSError? {
@@ -35,30 +35,25 @@ class DataBaseLayer {
         return container
     }()
     
-    lazy var fetchedResultController: NSFetchedResultsController<Folder> = {
+    private lazy var fetchedResultController: NSFetchedResultsController<Folder> = {
         let request: NSFetchRequest = Folder.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Folder.name), ascending: true)]
 
         return NSFetchedResultsController(fetchRequest: request, managedObjectContext: viewContext, sectionNameKeyPath: nil, cacheName: nil)
     }()
     
-    var viewContext: NSManagedObjectContext {
+    private var viewContext: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
-    var backgroundContext: NSManagedObjectContext {
+    private var backgroundContext: NSManagedObjectContext {
         persistentContainer.newBackgroundContext()
     }
 
     func setDelegate(delegate: NSFetchedResultsControllerDelegate) {
         fetchedResultController.delegate = delegate
     }
-    
-    deinit {
-        print("deinit database")
-    }
 }
-
 
 extension DataBaseLayer: DataBasing {
     

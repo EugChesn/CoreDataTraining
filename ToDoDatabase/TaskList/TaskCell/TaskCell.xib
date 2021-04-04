@@ -34,7 +34,7 @@
                         </subviews>
                     </stackView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="gbB-zM-t8Q">
-                        <rect key="frame" x="262.5" y="34" width="41.5" height="20.5"/>
+                        <rect key="frame" x="262.5" y="55.5" width="41.5" height="20.5"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nl2-DQ-a5I" userLabel="timeLabel">
                                 <rect key="frame" x="0.0" y="0.0" width="41.5" height="20.5"/>
@@ -48,10 +48,10 @@
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="6PW-P2-7oc" secondAttribute="bottom" constant="16" id="6aa-0P-nrU"/>
                     <constraint firstItem="6PW-P2-7oc" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="PN9-Y3-co7"/>
-                    <constraint firstItem="gbB-zM-t8Q" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="iAd-U4-oYe"/>
                     <constraint firstAttribute="trailing" secondItem="gbB-zM-t8Q" secondAttribute="trailing" constant="16" id="pug-oJ-iYU"/>
                     <constraint firstItem="gbB-zM-t8Q" firstAttribute="leading" secondItem="6PW-P2-7oc" secondAttribute="trailing" constant="16" id="sZc-DH-LzQ"/>
                     <constraint firstItem="6PW-P2-7oc" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="12" id="wv2-Km-87t"/>
+                    <constraint firstAttribute="bottom" secondItem="gbB-zM-t8Q" secondAttribute="bottom" constant="12" id="z5t-BX-d10"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
