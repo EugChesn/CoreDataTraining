@@ -11,7 +11,7 @@ import CoreData
 protocol DataBaseTaskList {
     func addTask(folder: Folder, taskData: TaskData) -> Task?
     func removeTask(folder: Folder, task: Task)
-    func testMax(nameFolder: String)
+    func testMax(folder: Folder)
 }
 
 class DatabaseLayerTaskList: DataBaseTaskList {
@@ -60,24 +60,21 @@ class DatabaseLayerTaskList: DataBaseTaskList {
         }
     }
     
-    func testMax(nameFolder: String) {
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Folder")
+    func testMax(folder: Folder) {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
         request.resultType = .dictionaryResultType
 
         let expressionDescription = NSExpressionDescription()
         expressionDescription.name = "max"
-        let keypathExpression = NSExpression(forKeyPath: #keyPath(Folder.tasks)) // count?
-        expressionDescription.expression = NSExpression(forFunction: "max:", arguments: [keypathExpression])
-        expressionDescription.expressionResultType = .integer64AttributeType
+        expressionDescription.expression = NSExpression(format: "date.@max")
+        expressionDescription.expressionResultType = .dateAttributeType
 
-        
         request.propertiesToFetch = [expressionDescription]
-        request.predicate = NSPredicate(format: "name == %@", nameFolder)
        
         
         persistentContainer.performBackgroundTask { (context) in
             do {
-                if let result = try context.fetch(request) as? [[String: Int64]] {
+                if let result = try context.fetch(request) as? [[String: Date]] {
                     print(result.first?.values)
                 }
             }

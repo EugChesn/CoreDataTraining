@@ -3,7 +3,7 @@
     <entity name="Folder" representedClassName=".Folder" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Task" inverseName="folder" inverseEntity="Task"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Task" inverseName="folder" inverseEntity="Task"/>
     </entity>
     <entity name="Task" representedClassName=".Task" syncable="YES">
         <attribute name="content" optional="YES" attributeType="String"/>
@@ -12,7 +12,7 @@
         <relationship name="folder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Folder" inverseName="tasks" inverseEntity="Folder"/>
     </entity>
     <elements>
-        <element name="Folder" positionX="-232.9933471679688" positionY="-327.5572814941406" width="128" height="88"/>
+        <element name="Folder" positionX="-232.9933471679688" positionY="-327.5572814941406" width="128" height="74"/>
         <element name="Task" positionX="18" positionY="81" width="128" height="103"/>
     </elements>
 </model>

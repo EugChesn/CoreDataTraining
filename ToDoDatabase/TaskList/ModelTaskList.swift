@@ -60,6 +60,6 @@ extension ModelTaskList: TaskListModeling {
     }
     
     func testMax() {
-        databaseService.testMax(nameFolder: folder.name!)
+        databaseService.testMax(folder: folder)
     }
 }
