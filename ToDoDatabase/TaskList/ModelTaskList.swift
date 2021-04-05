@@ -13,20 +13,20 @@ protocol DelegateUpdateViewTaskList: class {
 }
 
 protocol TaskListModeling {
+    func fetchFolderById()
     func addTask(data: TaskData)
     func removeTask(index: Int)
-    
-    func testMax()
+    func save()
     
     var taskList: [Task] { get }
-    var folderName: String { get }
+    var folderName: String? { get }
     var delegateView: DelegateUpdateViewTaskList? { get set }
 }
 
 class ModelTaskList {
  
     private var databaseService: DatabaseLayerTaskList
-    private var folder: Folder
+    private var folderId: NSManagedObjectID
     
     weak var delegateView: DelegateUpdateViewTaskList?
     
@@ -36,30 +36,43 @@ class ModelTaskList {
         }
     }
         
-    init(databaseService: DatabaseLayerTaskList, folder: Folder) {
+    init(databaseService: DatabaseLayerTaskList, folderId: NSManagedObjectID) {
         self.databaseService = databaseService
-        self.folder = folder
-        self.taskList = Array(folder.tasks ?? [])
+        self.folderId = folderId
+        self.databaseService.delegate = self
     }
 }
 
+// MARK: - DelegateHandleFetchFolder
+
+extension ModelTaskList: DelegateHandleFetchFolder {
+    func handleFetchedFodler() {
+        taskList = Array(databaseService.fetchedFolder?.tasks ?? [])
+    }
+}
+
+// MARK: - TaskListModeling
+
 extension ModelTaskList: TaskListModeling {
-    var folderName: String {
-        folder.name ?? "ERROR"
+    var folderName: String? {
+        databaseService.fetchedFolder?.name
+    }
+    
+    func save() {
+        databaseService.saveContext()
+    }
+    
+    func fetchFolderById() {
+        databaseService.fetchFolder(folderId: folderId)
     }
     
     func addTask(data: TaskData) {
-        if let task = databaseService.addTask(folder: folder, taskData: data) {
-            taskList.append(task)
-        }
+        let task = databaseService.addTask(taskData: data)
+        taskList.append(task)
     }
     
     func removeTask(index: Int) {
         let task = taskList.remove(at: index)
-        databaseService.removeTask(folder: folder, task: task)
-    }
-    
-    func testMax() {
-        databaseService.testMax(folder: folder)
+        databaseService.removeTask(task: task)
     }
 }

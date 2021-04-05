@@ -13,6 +13,6 @@
     </entity>
     <elements>
         <element name="Folder" positionX="-232.9933471679688" positionY="-327.5572814941406" width="128" height="74"/>
-        <element name="Task" positionX="18" positionY="81" width="128" height="103"/>
+        <element name="Task" positionX="18" positionY="81" width="128" height="89"/>
     </elements>
 </model>

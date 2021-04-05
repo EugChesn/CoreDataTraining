@@ -7,33 +7,41 @@
 
 import Foundation
 import CoreData
+import UIKit.UIApplication
 
-protocol DataBasing: class {
+protocol BaseDataBase: class {
+    func saveContext(errorMessage: String?)
+}
+
+extension BaseDataBase {
+    func saveContext(errorMessage: String? = nil) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let viewContext = appDelegate.persistentContainer.viewContext
+        do {
+            if viewContext.hasChanges {
+                try viewContext.save()
+            }
+        } catch {
+            fatalError("save context")
+        }
+    }
+}
+
+protocol DataBasing: BaseDataBase {
     func fetchFolders()
     func addFolder(name: String)
     func deleteFolder(index: Int)
     func setDelegate(delegate: NSFetchedResultsControllerDelegate)
-    
-    func addTask(taskData: TaskData, folderName: String) -> Task?
     
     var fetchedObjects: [Folder]? { get }
 }
 
 class DataBaseLayer {
     
-    init() {
-        viewContext.automaticallyMergesChangesFromParent = true
+    private var persistentContainer: NSPersistentContainer {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        return appDelegate.persistentContainer
     }
-    
-    private lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "modelData")
-        container.loadPersistentStores(completionHandler: { (_, error) in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        return container
-    }()
     
     private lazy var fetchedResultController: NSFetchedResultsController<Folder> = {
         let request: NSFetchRequest = Folder.fetchRequest()
@@ -44,10 +52,6 @@ class DataBaseLayer {
     
     private var viewContext: NSManagedObjectContext {
         return persistentContainer.viewContext
-    }
-    
-    private var backgroundContext: NSManagedObjectContext {
-        persistentContainer.newBackgroundContext()
     }
 
     func setDelegate(delegate: NSFetchedResultsControllerDelegate) {
@@ -64,33 +68,12 @@ extension DataBaseLayer: DataBasing {
     }
     
     func addFolder(name: String) {
-        let background = backgroundContext
-        background.performAndWait {
-            Folder.createFolder(name: name, date: Date(), context: background)
-            try? background.save()
-        }
+        Folder.createFolder(name: name, date: Date(), context: viewContext)
     }
     
     func deleteFolder(index: Int) {
         if let object = fetchedObjects?[index] {
             viewContext.delete(object)
-            try? viewContext.save()
-        }
-    }
-    
-    func addTask(taskData: TaskData, folderName: String) -> Task? {
-        let task = Task.createTask(name: taskData.name, content: taskData.content, date: Date(), context: viewContext)
-        if let index = fetchedObjects?.firstIndex(where: { $0.name == folderName }) {
-            fetchedObjects?[index].tasks?.insert(task)
-            do {
-                try viewContext.save()
-            } catch {
-                print("error save viewcontext")
-            }
-            return task
-            
-        } else {
-            return nil
         }
     }
 }

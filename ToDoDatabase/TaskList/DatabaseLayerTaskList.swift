@@ -7,59 +7,60 @@
 
 import Foundation
 import CoreData
+import UIKit.UIApplication
 
-protocol DataBaseTaskList {
-    func addTask(folder: Folder, taskData: TaskData) -> Task?
-    func removeTask(folder: Folder, task: Task)
-    func testMax(folder: Folder)
+
+protocol DataBaseTaskList: BaseDataBase {
+    var fetchedFolder: Folder? { get }
+    var delegate: DelegateHandleFetchFolder? { get set }
+    
+    func fetchFolder(folderId: NSManagedObjectID)
+    func addTask(taskData: TaskData) -> Task
+    func removeTask(task: Task)
+}
+
+protocol DelegateHandleFetchFolder: class {
+    func handleFetchedFodler()
 }
 
 class DatabaseLayerTaskList: DataBaseTaskList {
-    
-    private lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "modelData")
-        container.loadPersistentStores(completionHandler: { (_, error) in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        return container
-    }()
+        
+    private var persistentContainer: NSPersistentContainer {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        return appDelegate.persistentContainer
+    }
     
     private var viewContext: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
-    private var backgroundContext: NSManagedObjectContext {
-        persistentContainer.newBackgroundContext()
-    }
-        
-    func addTask(folder: Folder, taskData: TaskData) -> Task? {
-        if let context = folder.managedObjectContext {
-            let task = Task.createTask(name: taskData.name, content: taskData.content, date: Date(), context: context)
-            folder.tasks?.insert(task)
-            do {
-                try context.save()
-                return task
-            } catch {
-                return nil
-            }
-        }
-        
-        return nil
-    }
+    weak var delegate: DelegateHandleFetchFolder?
     
-    func removeTask(folder: Folder, task: Task) {
-        if let context = folder.managedObjectContext {
-            folder.tasks?.remove(task)
-            do {
-                try context.save()
-            } catch {
-                print("error")
-            }
+    private(set) var fetchedFolder: Folder? {
+        didSet {
+            delegate?.handleFetchedFodler()
         }
     }
     
+    func fetchFolder(folderId: NSManagedObjectID) {
+        fetchedFolder = persistentContainer.viewContext.object(with: folderId) as? Folder
+    }
+        
+    func addTask(taskData: TaskData) -> Task {
+        let task = Task.createTask(name: taskData.name, content: taskData.content, date: Date(), context: viewContext)
+        task.folder = fetchedFolder
+        fetchedFolder?.tasks?.insert(task)
+        return task
+    }
+    
+    func removeTask(task: Task) {
+        fetchedFolder?.tasks?.remove(task)
+    }
+}
+
+// MARK: Example using agregate functions
+
+extension DatabaseLayerTaskList {
     func testMax(folder: Folder) {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
         request.resultType = .dictionaryResultType
@@ -72,15 +73,15 @@ class DatabaseLayerTaskList: DataBaseTaskList {
         request.propertiesToFetch = [expressionDescription]
        
         
-        persistentContainer.performBackgroundTask { (context) in
-            do {
-                if let result = try context.fetch(request) as? [[String: Date]] {
-                    print(result.first?.values)
-                }
-            }
-            catch {
-                print("error")
-            }
-        }
+//        persistentContainer.performBackgroundTask { (context) in
+//            do {
+//                if let result = try context.fetch(request) as? [[String: Date]] {
+//                    print(result.first?.values)
+//                }
+//            }
+//            catch {
+//                print("error")
+//            }
+//        }
     }
 }

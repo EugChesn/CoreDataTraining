@@ -16,6 +16,26 @@ class TaskListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         updateUI()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(moveToBackground),
+                                               name: UIApplication.didEnterBackgroundNotification,
+                                               object: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        model.fetchFolderById()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        model.save()
+    }
+    
+    @objc
+    private func moveToBackground() {
+        model.save()
     }
     
     private func updateUI() {
@@ -36,12 +56,12 @@ class TaskListViewController: UIViewController {
         presentInputPopUp { [weak self] result in
             self?.model.addTask(data: result)
         }
-       // model.testMax()
     }
 }
 
 extension TaskListViewController: DelegateUpdateViewTaskList {
     func update() {
+        title = model.folderName
         tableView.reloadData()
     }
 }

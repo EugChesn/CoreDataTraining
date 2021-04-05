@@ -9,11 +9,15 @@ import UIKit
 import CoreData
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
+class AppDelegate: UIResponder, UIApplicationDelegate, BaseDataBase {
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         checkFirstLaunch()
         return true
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        saveContext()
     }
     
     lazy var persistentContainer: NSPersistentContainer = {
@@ -39,12 +43,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             var setTasks = Set<Task>()
             setTasks.insert(task)
             folder.tasks = setTasks
-            
-            do {
-                try viewContext.save()
-            } catch {
-                print("error save first launch")
-            }
         }
     }
 }

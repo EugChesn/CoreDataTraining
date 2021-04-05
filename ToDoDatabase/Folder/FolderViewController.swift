@@ -25,6 +25,11 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         updateUI()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(moveToBackground),
+                                               name: UIApplication.didEnterBackgroundNotification,
+                                               object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -37,10 +42,15 @@ class ViewController: UIViewController {
         if let viewController = segue.destination as? TaskListViewController {
             if let folderObject = sender as? Folder {
                 let database = DatabaseLayerTaskList()
-                let model = ModelTaskList(databaseService: database, folder: folderObject)
+                let model = ModelTaskList(databaseService: database, folderId: folderObject.objectID)
                 viewController.model = model
             }
         }
+    }
+    
+    @objc
+    private func moveToBackground() {
+        model.save()
     }
     
     private func updateUI() {
@@ -57,6 +67,8 @@ class ViewController: UIViewController {
         }
     }
 }
+
+// MARK: - DelegateUpdateUI
 
 extension ViewController: DelegateUpdateUI {
     func insertRows(index: Int) {
@@ -75,7 +87,7 @@ extension ViewController: DelegateUpdateUI {
     }
 }
 
-//UITableViewDataSource
+// MARK: - UITableViewDataSource
 
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -94,7 +106,7 @@ extension ViewController: UITableViewDataSource {
     
 }
 
-//UITableViewDelegate
+// MARK: - UITableViewDelegate
 
 extension ViewController: UITableViewDelegate {
     

@@ -20,6 +20,7 @@ protocol Modeling {
     func fetchFolders()
     func addFolder(name: String)
     func deleteFolder(index: Int)
+    func save()
     
     func setDelegate()
     func setDelegateUI(view: DelegateUpdateUI?)
@@ -46,6 +47,8 @@ class FolderModel: NSObject {
     }
 }
 
+// MARK: - NSFetchedResultsControllerDelegate
+
 extension FolderModel: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
@@ -68,6 +71,8 @@ extension FolderModel: NSFetchedResultsControllerDelegate {
     }
 }
 
+// MARK: - Modeling
+
 extension FolderModel: Modeling {
     func fetchFolders() {
         databaseService.fetchFolders()
@@ -79,6 +84,10 @@ extension FolderModel: Modeling {
     
     func deleteFolder(index: Int) {
         databaseService.deleteFolder(index: index)
+    }
+    
+    func save() {
+        databaseService.saveContext()
     }
     
     var fetchedObjects: [Folder]? {
