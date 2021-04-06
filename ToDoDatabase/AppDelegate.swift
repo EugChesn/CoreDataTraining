@@ -11,8 +11,13 @@ import CoreData
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, BaseDataBase {
     
+    var window: UIWindow?
+    var coordinator: MainCoordinator!
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         checkFirstLaunch()
+        configureRootCoordinator()
+        
         return true
     }
     
@@ -29,6 +34,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, BaseDataBase {
         })
         return container
     }()
+    
+    private func configureRootCoordinator() {
+        let navController = UINavigationController()
+        let moduleAssembler = ModuleAssembler()
+        coordinator = MainCoordinator(navigationController: navController, moduleAssembler: moduleAssembler)
+        coordinator?.start()
+        
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = navController
+        window?.makeKeyAndVisible()
+    }
     
     private func checkFirstLaunch() {
         if UserDefaults.isFirstLaunch() {

@@ -10,6 +10,7 @@ import UIKit
 class TaskListViewController: UIViewController {
     
     var model: TaskListModeling!
+    weak var coordinator: MainCoordinator?
     
     @IBOutlet private weak var tableView: UITableView!
     
@@ -53,7 +54,9 @@ class TaskListViewController: UIViewController {
     
     @objc
     func tapPlus() {
-        presentInputPopUp { [weak self] result in
+        coordinator?.presentInputPopUp { [weak self] result in
+            self?.coordinator?.dismissInputPopUp()
+            guard let result = result else { return }
             self?.model.addTask(data: result)
         }
     }

@@ -8,19 +8,12 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController {
+class FolderViewController: UIViewController {
     
     var model: Modeling!
+    weak var coordinator: MainCoordinator?
     
     @IBOutlet private weak var tableview: UITableView!
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        let database = DataBaseLayer()
-        model = FolderModel(databaseService: database)
-        model.setDelegate()
-        model.setDelegateUI(view: self)
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,18 +27,8 @@ class ViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        coordinator?.presenter = self
         model.fetchFolders()
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        super.prepare(for: segue, sender: sender)
-        if let viewController = segue.destination as? TaskListViewController {
-            if let folderObject = sender as? Folder {
-                let database = DatabaseLayerTaskList()
-                let model = ModelTaskList(databaseService: database, folderId: folderObject.objectID)
-                viewController.model = model
-            }
-        }
     }
     
     @objc
@@ -62,15 +45,17 @@ class ViewController: UIViewController {
     
     @objc
     private func addFolderTap() {
-        presentInputPopUp(isFolder: true) { [weak self] result in
+        coordinator?.presentInputPopUp(isFolder: true, completion: { [weak self] result in
+            self?.coordinator?.dismissInputPopUp()
+            guard let result = result else { return }
             self?.model.addFolder(name: result.name)
-        }
+        })
     }
 }
 
 // MARK: - DelegateUpdateUI
 
-extension ViewController: DelegateUpdateUI {
+extension FolderViewController: DelegateUpdateUI {
     func insertRows(index: Int) {
         let indexPath = IndexPath(row: index, section: 0)
         tableview.insertRows(at: [indexPath], with: .automatic)
@@ -89,7 +74,7 @@ extension ViewController: DelegateUpdateUI {
 
 // MARK: - UITableViewDataSource
 
-extension ViewController: UITableViewDataSource {
+extension FolderViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         model.fetchedObjects?.count ?? 0
     }
@@ -108,7 +93,7 @@ extension ViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 
-extension ViewController: UITableViewDelegate {
+extension FolderViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
@@ -119,6 +104,9 @@ extension ViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableview.deselectRow(at: indexPath, animated: true)
-        performSegue(withIdentifier: "showTaskList", sender: model.fetchedObjects?[indexPath.row])
+        
+        if let id = model.fetchedObjects?[indexPath.row].objectID {
+            coordinator?.showTaskList(objectId: id)
+        }
     }
 }
